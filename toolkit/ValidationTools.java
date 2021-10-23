@@ -25,7 +25,7 @@ public final class ValidationTools {
 	private static Set<String> tld = new HashSet<String>();
 
 	/**
-	 * Evaluates whether a given website is a valid organization(*.{@value ValidationTools#COMMERCIAL_TOP_LEVEL_DOMAIN})) one. Conforms to RFC 2732.
+	 * Evaluates whether a given website is a valid commercial(*.{@value ValidationTools#COMMERCIAL_TOP_LEVEL_DOMAIN})) one. Conforms to RFC 2732.
 	 * 
 	 * @param webAddress The web address to be tested.
 	 * @return Whether the web address is a valid commercial one.
@@ -38,7 +38,7 @@ public final class ValidationTools {
 	}
 
 	/**
-	 * Evaluates whether a given website is a valid organization(*.{@value ValidationTools#ORGANIZATION_TOP_LEVEL_DOMAIN})) one. Conforms to RFC 2732.
+	 * Evaluates whether a given website is a valid organizational(*.{@value ValidationTools#ORGANIZATION_TOP_LEVEL_DOMAIN})) one. Conforms to RFC 2732.
 	 * 
 	 * @param webAddress The web address to be tested.
 	 * @return Whether the web address is a valid organizational one.
@@ -92,6 +92,7 @@ public final class ValidationTools {
 	 * Gets the most recent TLD query header.
 	 * 
 	 * @return The IANA version header if a TLD database was queried successfully.
+	 * @since 0.0.1
 	 */
 	public static String getIanaVersionHeader() {
 		return ianaVersionHeader;
@@ -99,6 +100,7 @@ public final class ValidationTools {
 
 	/**
 	 * Resets the TLD database by clearing all known TLDs.
+	 * @since 0.0.1
 	 */
 	public static void reset() {
 		ianaVersionHeader = null;
