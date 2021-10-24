@@ -13,7 +13,7 @@ import java.util.Set;
  * 
  * @author DZ-FSDev
  * @since 16.0.1
- * @version 0.0.1
+ * @version 0.0.2
  */
 public final class ValidationTools {
 	public final static String IANA_TLD_WEB_ADDRESS = "https://data.iana.org/TLD/tlds-alpha-by-domain.txt";
@@ -25,29 +25,29 @@ public final class ValidationTools {
 	private static Set<String> tld = new HashSet<String>();
 
 	/**
-	 * Evaluates whether a given website is a valid commercial(*.{@value ValidationTools#COMMERCIAL_TOP_LEVEL_DOMAIN})) one. Conforms to RFC 2732.
+	 * Evaluates whether a given website is a valid commercial(*.{@value ValidationTools#COMMERCIAL_TOP_LEVEL_DOMAIN})) one. Conforms to RFC 2732 & RFC 2396.
 	 * 
 	 * @param webAddress The web address to be tested.
 	 * @return Whether the web address is a valid commercial one.
 	 * @throws MalformedURLException When the web address provided cannot be parsed to conform to RFC 2732.
-	 * @since 0.0.1
+	 * @since 0.0.2
 	 */
-	public static boolean isWebsiteCommercial(String webAddress) throws MalformedURLException
-	{
-		return COMMERCIAL_TOP_LEVEL_DOMAIN.equalsIgnoreCase(new URL(webAddress).getHost());
+	public static boolean isWebsiteCommercial(String webAddress) throws MalformedURLException {
+		String host = new URL(webAddress).getHost();
+		return COMMERCIAL_TOP_LEVEL_DOMAIN.equals(host.substring(host.lastIndexOf('.')));
 	}
 
 	/**
-	 * Evaluates whether a given website is a valid organizational(*.{@value ValidationTools#ORGANIZATION_TOP_LEVEL_DOMAIN})) one. Conforms to RFC 2732.
+	 * Evaluates whether a given website is a valid organizational(*.{@value ValidationTools#ORGANIZATION_TOP_LEVEL_DOMAIN})) one. Conforms to RFC 2732 & RFC 2396.
 	 * 
 	 * @param webAddress The web address to be tested.
 	 * @return Whether the web address is a valid organizational one.
 	 * @throws MalformedURLException When the web address provided cannot be parsed to conform to RFC 2732.
-	 * @since 0.0.1
+	 * @since 0.0.2
 	 */
-	public static boolean isWebsiteOrganizational(String webAddress) throws MalformedURLException
-	{
-		return ORGANIZATION_TOP_LEVEL_DOMAIN.equalsIgnoreCase(new URL(webAddress).getHost());
+	public static boolean isWebsiteOrganizational(String webAddress) throws MalformedURLException {
+		String host = new URL(webAddress).getHost();
+		return ORGANIZATION_TOP_LEVEL_DOMAIN.equals(host.substring(host.lastIndexOf('.')));
 	}
 
 	/**
