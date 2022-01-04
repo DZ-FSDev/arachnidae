@@ -21,6 +21,7 @@ package com.dz_fs_dev.arachnidae.toolkit.wikimedia;
 import java.io.IOException;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.dz_fs_dev.common.counters.PerMinuteExponentialRateCounter;
 import com.dz_fs_dev.common.net.NetTools;
@@ -35,11 +36,11 @@ import com.dz_fs_dev.common.net.NetTools;
  * 
  * @author DZ_FSDev
  * @since 17.0.1
- * @version 0.0.1
+ * @version 0.0.2
  */
 public final class WikipediaTools {
 	private WikipediaTools() {}
-	
+
 	/**
 	 * The default read rate limit per minute to adhere to when no limit was
 	 * provided by Wikipedia's API on application initialization. 
@@ -47,19 +48,24 @@ public final class WikipediaTools {
 	private static final int DEFAULT_READ_RATELIMIT = 200;
 	private static final int EMA_PERIOD = 6;
 	
+	private static final String WAPI = "https://en.wikipedia.org/w/api.php?";
+
 	private static boolean sleepThrottling = true;
-	
+
 	//TODO https://en.wikipedia.org/w/api.php?action=query&meta=userinfo&uiprop=ratelimits
 	private static PerMinuteExponentialRateCounter requestRateCounter =
 			new PerMinuteExponentialRateCounter(WikipediaTools.EMA_PERIOD);
 
 	/**
+	 * Returns an array of wikimedia page title suggestions given an impartial
+	 * query.
 	 * 
-	 * 
-	 * @param query
-	 * @return
-	 * @throws JSONException
-	 * @throws IOException
+	 * @param query The specified query to render suggestions.
+	 * @return The suggestions rendered for the specified query.
+	 * @throws JSONException Thrown when the format of the JSON data from
+	 *                       Wikipedia may be malformed.
+	 * @throws IOException Thrown if unable to connect to Wikipedia's web API.
+	 * @since 0.0.1
 	 */
 	public static String[] getSuggestions(String query) throws JSONException, IOException {
 		if(sleepThrottling && requestRateCounter.poll() > WikipediaTools.DEFAULT_READ_RATELIMIT) {
@@ -67,14 +73,37 @@ public final class WikipediaTools {
 		}
 		requestRateCounter.tick();
 		JSONArray jarr = NetTools.tryReadJSONArrayFromUrl(
-				String.format("https://en.wikipedia.org/w/api.php?action=opensearch&search=%s", query)).getJSONArray(1);
+				String.format("%saction=opensearch&search=%s&format=json", WAPI, query)).getJSONArray(1);
 		String[] ret = new String[jarr.length()];
-		
+
 		for(int i = 0; i < ret.length; i++) {
 			ret[i] = jarr.getString(i);
 		}
-		
+
 		return ret;
+	}
+	
+	/**
+	 * Returns the Wikipedia summary text given a page title.
+	 * 
+	 * @param title The specified page title to query for the summary text.
+	 * @return The Wikipedia summary text given a page title.
+	 * @throws JSONException Thrown when the format of the JSON data from
+	 *                       Wikipedia may be malformed.
+	 * @throws IOException Thrown if unable to connect to Wikipedia's web API.
+	 * @since 0.0.2
+	 */
+	public static String getSummary(String title) throws JSONException, IOException {
+		if(sleepThrottling && requestRateCounter.poll() > WikipediaTools.DEFAULT_READ_RATELIMIT) {
+			//TODO
+		}
+		requestRateCounter.tick();
+		JSONObject jobj = NetTools.tryReadJSONFromUrl(
+				String.format("%saction=query&prop=extracts&exintro&explaintext&redirects=1&titles=%s&format=json", 
+						WAPI, title.replace(' ', '_'))).getJSONObject("query").getJSONObject("pages");
+		jobj = jobj.getJSONObject(jobj.keys().next());
+		
+		return jobj.getString("extract").trim();
 	}
 	
 	/**
